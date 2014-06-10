@@ -7,9 +7,11 @@ use Pred::Types qw(identifier);
 use Package::Generator;
 
 sub new {
+  my ($package, $name) = @_;
+  $package = $package->blessed($package) || $package;
   bless {
-    package => Package::Generator->new_package
-  }, __PACKAGE__;
+    package => ($name || Package::Generator->new_package),
+  }, $package;
 }
 
 sub bless {
@@ -39,9 +41,7 @@ sub exists_in {
 
 sub install_glob {
   my ($self, $name) = @_;
-  my $new = bless {
-    package => $name,
-  }, __PACKAGE__;
+  my $new = $self->new($name);
   my @keys = grep
     !/\A(?:\*|(?:can|isa|DESTROY|AUTOLOAD)$)/,
     %{$self->{'package'} . "::"};
