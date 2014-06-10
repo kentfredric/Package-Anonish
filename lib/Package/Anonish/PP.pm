@@ -9,8 +9,11 @@ use Package::Generator;
 sub new {
   my ($package, $name) = @_;
   $package = $package->blessed($package) || $package;
-  bless {
-    package => ($name || Package::Generator->new_package),
+  $name ||= Package::Generator->new_package;
+  eval "package $name";
+  croak($@) if $@;
+  return bless {
+    package => $name,
   }, $package;
 }
 
