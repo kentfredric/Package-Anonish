@@ -4,17 +4,17 @@ use Carp qw(carp croak);
 use Scalar::Util ();
 use Sub::Install qw(install_sub);
 use Pred::Types qw(identifier);
-use Package::Stash;
+use Package::Generator;
 
 sub new {
   bless {
-		package => Package::Stash->new({})
+    package => Package::Generator->new_package
   }, __PACKAGE__;
 }
 
-sub bless_in {
+sub bless {
   my ($self, $ref) = @_;
-  bless $ref, (''. $self->{'package'});
+  CORE::bless $ref, $self->{'package'};
 }
 
 sub add_method {
@@ -31,11 +31,26 @@ sub blessed {
   Scalar::Util::blessed($obj);
 }
 
+sub exists_in {
+  my ($self, $fn) = @_;
+  no strict 'refs';
+  return (defined &{$self->{'package'} . '::' . $fn});
+}
+
 sub install_glob {
   my ($self, $name) = @_;
-  bless {
-    package => Package::Stash->new($name)
+  my $new = bless {
+    package => $name,
   }, __PACKAGE__;
+  my @keys = grep
+    !/\A(?:\*|(?:can|isa|DESTROY|AUTOLOAD)$)/,
+    %{$self->{'package'} . "::"};
+  foreach my $key (@keys) {
+    unless (exists_in($new, $key)) {
+      $new->add_method($key, \&{$self->{'package'} . "::$key"});
+    }
+  }
+  return $new;
 }
 
 sub create_glob {
