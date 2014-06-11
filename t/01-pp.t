@@ -21,4 +21,5 @@ my $b = $a->create_glob("TestABC");
 $b->add_method('bar', sub { 43 });
 eq_or_diff(TestABC->bar, 43);
 eq_or_diff(TestABC->foo, 42);
+eq_or_diff([sort keys %TestABC::],[qw(bar foo)]);
 done_testing;

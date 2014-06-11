@@ -42,6 +42,11 @@ sub exists_in {
   return (defined &{$self->{'package'} . '::' . $fn});
 }
 
+sub methods {
+  my ($self) = @_;
+	grep !/^(?:(?:isa|can|DESTROY|AUTOLOAD)$|\*)/, keys %{$self->{'package'} . "::"};
+}
+
 sub install_glob {
   my ($self, $name) = @_;
   my $new = $self->new($name);
