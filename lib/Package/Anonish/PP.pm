@@ -1,3 +1,6 @@
+use strict;
+use warnings;
+
 package Package::Anonish::PP;
 
 # ABSTRACT: Create lightweight anonymous metaclass objects.
