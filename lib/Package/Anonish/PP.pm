@@ -45,26 +45,31 @@ sub blessed {
   Scalar::Util::blessed($obj);
 }
 
-sub exists_in {
-  my ($self, $fn) = @_;
+sub _get_stash {
+  my ($self) = @_;
   no strict 'refs';
-  return (defined &{$self->{'package'} . '::' . $fn});
+  return \%{ $self->{package} . '::' };
+}
+
+sub exists_in {
+  my ( $self, $fn ) = @_;
+  return defined &{ $self->_get_stash()->{$fn} };
 }
 
 sub methods {
   my ($self) = @_;
-	grep !/^(?:(?:isa|can|DESTROY|AUTOLOAD)$|\*)/, keys %{$self->{'package'} . "::"};
+
+  grep !/^(?:(?:isa|can|DESTROY|AUTOLOAD)$|\*)/, keys %{ $self->_get_stash() };
 }
 
 sub install_glob {
-  my ($self, $name) = @_;
-  my $new = $self->new($name);
-  my @keys = grep
-    !/\A(?:\*|(?:can|isa|DESTROY|AUTOLOAD)$)/,
-    %{$self->{'package'} . "::"};
+  my ( $self, $name ) = @_;
+  my $new   = $self->new($name);
+  my $stash = $self->_get_stash();
+  my @keys  = grep !/\A(?:\*|(?:can|isa|DESTROY|AUTOLOAD)$)/, keys %{$stash};
   foreach my $key (@keys) {
-    unless (exists_in($new, $key)) {
-      $new->add_method($key, \&{$self->{'package'} . "::$key"});
+    unless ( exists_in( $new, $key ) ) {
+      $new->add_method( $key, \&{ $stash->{$key} } );
     }
   }
   return $new;
