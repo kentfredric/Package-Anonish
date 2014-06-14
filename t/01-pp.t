@@ -4,7 +4,7 @@ use Package::Anonish::PP;
 
 subtest q[Create Fully Anonymous] => sub {
   my $a = Package::Anonish::PP->new;
-  eq_or_diff( [ keys %$a ], ['package'], 'Anonymous Class is an object with a single key: package' );
+  eq_or_diff( [ sort keys %$a ], [ 'package', 'stash' ], 'Anonymous Class has only expected starting keys' );
 };
 
 subtest q[Create Named] => sub {

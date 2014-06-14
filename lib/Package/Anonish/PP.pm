@@ -14,6 +14,7 @@ use Scalar::Util ();
 use Sub::Install qw(install_sub);
 use Pred::Types qw(identifier);
 use Package::Generator;
+use Package::Stash;
 
 sub new {
   my ($package, $name) = @_;
@@ -23,6 +24,7 @@ sub new {
   croak($@) if $@;
   return bless {
     package => $name,
+    stash   => Package::Stash->new($name),
   }, $package;
 }
 
@@ -45,31 +47,23 @@ sub blessed {
   Scalar::Util::blessed($obj);
 }
 
-sub _get_stash {
-  my ($self) = @_;
-  no strict 'refs';
-  return \%{ $self->{package} . '::' };
-}
-
 sub exists_in {
   my ( $self, $fn ) = @_;
-  return defined &{ $self->_get_stash()->{$fn} };
+  return $self->{stash}->has_symbol( '&' . $fn );
 }
 
 sub methods {
   my ($self) = @_;
-
-  grep !/^(?:(?:isa|can|DESTROY|AUTOLOAD)$|\*)/, keys %{ $self->_get_stash() };
+  grep !/^(?:(?:isa|can|DESTROY|AUTOLOAD)$|\*)/, $self->{stash}->list_all_symbols('CODE');
 }
 
 sub install_glob {
   my ( $self, $name ) = @_;
-  my $new   = $self->new($name);
-  my $stash = $self->_get_stash();
-  my @keys  = grep !/\A(?:\*|(?:can|isa|DESTROY|AUTOLOAD)$)/, keys %{$stash};
+  my $new = $self->new($name);
+  my @keys = grep !/\A(?:\*|(?:can|isa|DESTROY|AUTOLOAD)$)/, $self->{stash}->list_all_symbols('CODE');
   foreach my $key (@keys) {
     unless ( exists_in( $new, $key ) ) {
-      $new->add_method( $key, \&{ $stash->{$key} } );
+      $new->add_method( $key, $self->{stash}->get_symbol( '&' . $key ) );
     }
   }
   return $new;
