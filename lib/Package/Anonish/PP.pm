@@ -1,5 +1,7 @@
 package Package::Anonish::PP;
 
+# ABSTRACT: Create lightweight anonymous metaclass objects.
+
 use Carp qw(carp croak);
 use Scalar::Util ();
 use Sub::Install qw(install_sub);
