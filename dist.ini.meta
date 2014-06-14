@@ -1,0 +1,17 @@
+name    = Package-Anonish
+author  = James Edward Daniel <james@codegems.org>
+author  = Kent Fredric <kentnl@cpan.org>
+license = Perl_5
+copyright_holder = James Edward Daniel
+copyright_year   = 2014
+
+[@Author::KENTNL]
+:version         = 2.016000
+git_versions     = 1
+toolkit          = eumm
+toolkit_hardness = soft
+normal_form      = numify
+mantissa         = 6
+
+[Prereqs]
+[Prereqs / TestRequires]
