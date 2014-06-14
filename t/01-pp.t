@@ -6,7 +6,7 @@ my $a = Package::Anonish::PP->new;
 eq_or_diff([keys %$a], ['package']);
 my $b = Package::Anonish::PP->new('Foo');
 no strict 'refs';
-ok(defined %{"Foo::"});
+ok(%{"Foo::"});
 
 $a->add_method('foo', sub{ 42 });
 eq_or_diff($a->{'package'}->foo, 42);
