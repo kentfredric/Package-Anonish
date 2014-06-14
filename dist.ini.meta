@@ -12,6 +12,7 @@ toolkit          = eumm
 toolkit_hardness = soft
 normal_form      = numify
 mantissa         = 6
+bumpversions     = 1
 
 [Prereqs]
 [Prereqs / TestRequires]

@@ -3,6 +3,8 @@ use warnings;
 
 package Package::Anonish::PP;
 
+our $VERSION = '0.001000';
+
 # ABSTRACT: Create lightweight anonymous metaclass objects.
 
 use Carp qw(carp croak);
